@@ -2,37 +2,135 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ค้นหา Serial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🔍 ตรวจสอบ Serial Warranty</title>
   <style>
-    body { font-family: sans-serif; padding: 40px; max-width: 600px; margin: auto; }
-    input, button { font-size: 18px; padding: 10px; width: 100%; margin-bottom: 12px; }
-    #result { margin-top: 20px; font-size: 16px; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9fafc;
+      color: #2c3e50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      max-width: 400px;
+      padding: 14px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+      transition: border 0.2s;
+    }
+
+    input:focus {
+      border-color: #3498db;
+    }
+
+    button {
+      width: 100%;
+      max-width: 400px;
+      padding: 14px;
+      background: #3498db;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    .status {
+      margin-top: 24px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .result {
+      margin-top: 16px;
+      font-size: 16px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 400px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .found {
+      color: #27ae60;
+    }
+
+    .not-found {
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
-  <h2>🔍 ค้นหา Serial Number</h2>
-  <input id="serial" placeholder="พิมพ์ Serial Number">
+
+  <h1>🔍 ค้นหา Serial Number</h1>
+  <input id="serial" type="text" placeholder="กรอก Serial Number">
   <button onclick="search()">ค้นหา</button>
-  <div id="result"></div>
+
+  <div class="status" id="status"></div>
+  <div class="result" id="result"></div>
 
   <script>
-    const SHEET_URL = "https://opensheet.elk.sh/18r0YdKmEnrVmOxjFNysVWW3Z7w31QkUglL48dx9v_Rc/Sheet2"; // 🔁 เปลี่ยน URL ของพี่
+    const SHEET_URL = "https://opensheet.elk.sh/18r0YdKmEnrVmOxjFNysVWW3Z7w31QkUglL48dx9v_Rc/Sheet2";
 
     async function search() {
       const input = document.getElementById("serial").value.trim().toLowerCase();
-      const res = await fetch(SHEET_URL);
-      const data = await res.json();
+      const status = document.getElementById("status");
+      const result = document.getElementById("result");
 
-      const found = data.find(row => row["Serial Number"].toLowerCase() === input);
+      if (!input) {
+        alert("กรุณากรอก Serial Number");
+        return;
+      }
 
-      document.getElementById("result").innerHTML = found
-        ? `✅ พบข้อมูล<br>
-          รุ่น: ${found.BrandModel}<br>
-          เริ่ม: ${found.StartDate}<br>
-          หมดอายุ: ${found.Expiredate}<br>
-          ประกัน: ${found.WarrantyYear} ปี`
-        : "❌ ไม่พบข้อมูล";
+      status.textContent = "⏳ กำลังค้นหา...";
+      result.innerHTML = "";
+
+      try {
+        const res = await fetch(SHEET_URL);
+        const data = await res.json();
+        const found = data.find(row => row["Serial Number"].toLowerCase() === input);
+
+        if (found) {
+          status.innerHTML = "✅ <span class='found'>พบข้อมูล</span>";
+          result.innerHTML = `
+            รุ่น: ${found.BrandModel}<br>
+            เริ่ม: ${found.StartDate}<br>
+            หมดอายุ: ${found.Expiredate}<br>
+            ประกัน: ${found.WarrantyYear} ปี
+          `;
+        } else {
+          status.innerHTML = "❌ <span class='not-found'>ไม่พบข้อมูล</span>";
+        }
+      } catch (e) {
+        status.innerHTML = "⚠️ เกิดข้อผิดพลาด";
+        console.error(e);
+      }
     }
   </script>
 </body>
