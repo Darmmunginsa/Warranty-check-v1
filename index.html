@@ -119,11 +119,11 @@
         if (found) {
           status.innerHTML = "✅ <span class='found'>พบข้อมูล</span>";
           result.innerHTML = `
-            Serial Number: ${found["Serial Number"]}
-            รุ่น: ${found.BrandModel}<br>
-            เริ่ม: ${found.StartDate}<br>
-            หมดอายุ: ${found.Expiredate}<br>
-            ประกัน: ${found.WarrantyYear} ปี
+           Serial Number: ${found["Serial Number"]}<br>
+           รุ่น: ${found.BrandModel}<br>
+           เริ่ม: ${found.StartDate}<br>
+           หมดอายุ: ${found.Expiredate}<br>
+           ประกัน: ${found.WarrantyYear} ปี
           `;
         } else {
           status.innerHTML = "❌ <span class='not-found'>ไม่พบข้อมูล</span>";
